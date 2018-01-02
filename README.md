@@ -10,5 +10,10 @@ The Robot Arm Tank consists of a highly-adaptable track chassis and a flexible r
 MegaPi is based on Arduino MEGA 2560 and supports programming with Arduino IDE. It can be divided into 6 function areas, allowing users to connect with various plug-in modules to drive motors and sensors and to realize wireless communication. 
 
 
+![megapi-d-2](https://user-images.githubusercontent.com/34246886/34482175-173a5f3e-efbf-11e7-8136-9921ede6a021.png)
+
+@Credits: www.makeblock.com
+
+
 
 
