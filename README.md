@@ -4,3 +4,11 @@ This program controls the Makeblock Ultimate 2.0 Robotic Arm Tank to navigate a 
 ## Robotic Arm Tank Description:
 The Robot Arm Tank consists of a highly-adaptable track chassis and a flexible robotic arm. This robot is designed to help user grip, lift, and deliver objects in various terrains.
 
+![1 robotic_arm_tank_4__68308-800x800](https://user-images.githubusercontent.com/34246886/34482052-4b77cd32-efbe-11e7-8645-1c2aac495fdb.JPG)
+
+## The Board - MegaPi
+MegaPi is based on Arduino MEGA 2560 and supports programming with Arduino IDE. It can be divided into 6 function areas, allowing users to connect with various plug-in modules to drive motors and sensors and to realize wireless communication. 
+
+
+
+
