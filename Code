@@ -1,0 +1,175 @@
+//WHAT:
+//This program controls the Makeblock Ultimate 2.0 Robotic Arm Tank to navigate a terrain and do a specific action (go and pick up a Christmas ornament, go to the tree and put
+//it on tree, go back to initial spot). Once the robot was built, the program was tested on Scratch and subsequently translated into Arduino. In the ChristmasRobot movie file,
+//you can see the robot in action, executing the program below.
+
+//WHO:
+//Mara Steiu, Mihnea Steiu
+
+//WHEN:
+//1/2/2018
+
+#include <Arduino.h> 
+#include <Wire.h> //This library allows users to communicate with I2C / TWI devices
+#include <SoftwareSerial.h> //Arduino has built-in support for serial communication on pins 0 and 1, but this library allows serial communication to take place on the 
+                            //other digital pins of users' board
+
+//Encoder Motors
+MeEncoderOnBoard Encoder_1(SLOT1); //encoder motor 1 controls right-side wheels of robot
+MeEncoderOnBoard Encoder_2(SLOT2); //encoder motor 2 controls left-side wheels of robot
+MeEncoderOnBoard Encoder_3(SLOT3); //encoder motor 3 controls arm of robot (moving up/down)
+MeEncoderOnBoard Encoder_4(SLOT4); //encoder motor 4 controls tongs of robot (to catch any object)
+
+//Functions for processing each encoder motor
+void isr_process_encoder1(void)
+{
+      if(digitalRead(Encoder_1.getPortB()) == 0){
+            Encoder_1.pulsePosMinus();
+      }else{
+            Encoder_1.pulsePosPlus();
+      }
+}
+
+void isr_process_encoder2(void)
+{
+      if(digitalRead(Encoder_2.getPortB()) == 0){
+            Encoder_2.pulsePosMinus();
+      }else{
+            Encoder_2.pulsePosPlus();
+      }
+}
+
+void isr_process_encoder3(void)
+{
+      if(digitalRead(Encoder_3.getPortB()) == 0){
+            Encoder_3.pulsePosMinus();
+      }else{
+            Encoder_3.pulsePosPlus();
+      }
+}
+
+void isr_process_encoder4(void)
+{
+      if(digitalRead(Encoder_4.getPortB()) == 0){
+            Encoder_4.pulsePosMinus();
+      }else{
+            Encoder_4.pulsePosPlus();
+      }
+}
+
+//Move function of robot, having 2 integer parameters: direction and speed
+void move(int direction, int speed)
+{
+      int leftSpeed = 0;
+      int rightSpeed = 0;
+      if(direction == 1){ //move to right
+            leftSpeed = -speed;
+            rightSpeed = speed;
+      }else if(direction == 2){ //move to left
+            leftSpeed = speed;
+            rightSpeed = -speed;
+      }else if(direction == 3){ //move forward
+            leftSpeed = speed;
+            rightSpeed = speed;
+      }else if(direction == 4){ //move backward
+            leftSpeed = -speed;
+            rightSpeed = -speed;
+      }
+      Encoder_1.setTarPWM(rightSpeed); //encoder motor that controls right wheels 
+      Encoder_2.setTarPWM(leftSpeed); //encoder motor that controls left wheels 
+}
+
+//Move function of robot which also offers user the option of controlling degrees for movement, having 3 integer parameters: direction, degrees, and speed
+void moveDegrees(int direction, long degrees, int speed_temp)
+{
+      speed_temp = abs(speed_temp);
+      if(direction == 1)//right
+      {
+            Encoder_1.move(degrees,(float)speed_temp);
+            Encoder_2.move(-degrees,(float)speed_temp);
+      }
+      else if(direction == 2)//left
+      {
+            Encoder_1.move(-degrees,(float)speed_temp);
+            Encoder_2.move(degrees,(float)speed_temp);
+      }
+      else if(direction == 3)//forward
+      {
+            Encoder_1.move(degrees,(float)speed_temp);
+            Encoder_2.move(degrees,(float)speed_temp);
+      }
+      else if(direction == 4)//backward
+      {
+            Encoder_1.move(-degrees,(float)speed_temp);
+            Encoder_2.move(-degrees,(float)speed_temp);
+      }
+    
+}
+
+double angle_rad = PI/180.0;
+double angle_deg = 180.0/PI;
+
+//Main function that controls robot and gives it instructions, using functions previously defined
+void setup(){
+    attachInterrupt(Encoder_1.getIntNum(), isr_process_encoder1, RISING);
+    attachInterrupt(Encoder_2.getIntNum(), isr_process_encoder2, RISING);
+    attachInterrupt(Encoder_3.getIntNum(), isr_process_encoder3, RISING);
+    
+    //Encoder motors 3, 4, 1 are used in program; set them up
+    Encoder_3.setPulse(8);
+    Encoder_3.setRatio(46.67);
+    Encoder_3.setPosPid(1.8,0,1.2);
+    Encoder_3.setSpeedPid(0.18,0,0);
+    attachInterrupt(Encoder_4.getIntNum(), isr_process_encoder4, RISING);
+    Encoder_4.setPulse(8);
+    Encoder_4.setRatio(46.67);
+    Encoder_4.setPosPid(1.8,0,1.2);
+    Encoder_4.setSpeedPid(0.18,0,0);
+    attachInterrupt(Encoder_1.getIntNum(), isr_process_encoder1, RISING);
+    Encoder_1.setPulse(8);
+    Encoder_1.setRatio(46.67);
+    Encoder_1.setPosPid(1.8,0,1.2);
+    Encoder_1.setSpeedPid(0.18,0,0);
+
+    //Start program by offering robot instructions
+    move(1,100);
+    _delay(4.5); 
+    Encoder_3.move(1075,abs(150));
+    _delay(2);
+    Encoder_4.runSpeed(-50);
+    _delay(10);
+    Encoder_3.runSpeed(-150);
+    _delay(3);
+    move(2,100);
+    _delay(3);
+    Encoder_1.move(2100,abs(50));
+    _delay(4);
+    move(1,150);
+    _delay(4);
+    Encoder_4.runSpeed(200);
+    _delay(7);
+    move(2,100);
+    _delay(7);
+    
+}
+
+void loop(){
+    
+    
+    _loop();
+}
+
+//Delay function defining the time to loop through a function/instruction
+void _delay(float seconds){
+    long endTime = millis() + seconds * 1000;
+    while(millis() < endTime)_loop();
+}
+
+void _loop(){
+    Encoder_1.loop();
+    Encoder_2.loop();
+    
+    Encoder_3.loop();
+    
+    Encoder_4.loop();
+}
